@@ -13,8 +13,12 @@ module Permutations
 #########################################################################
 
 include("MyUtils.jl")
-using .MyUtils:     overlap
-export              overlap
+using .MyUtils:     overlap, isless, 
+                    isvalid_plain_representation, isvalid_cycle_representation,
+                    plain_to_cycle, cycle_to_plain
+export              overlap, isless, 
+                    isvalid_plain_representation, isvalid_cycle_representation,
+                    plain_to_cycle, cycle_to_plain
 
 include("MyIntegers.jl")
 using .MyIntegers:  divisors, divisors_in_pairs, 

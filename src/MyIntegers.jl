@@ -127,7 +127,7 @@ function nt_regular_permutations(n)
     
     for k in divisors(n)[2:end-1]
         combin_nk = collect(combinations(UnitRange{UInt8}(1:n), k))
-        mk_blocks = compose(n, k, combin_nk)
+        mk_blocks = build_mk_blocks(n, k, combin_nk)
         nt_rp_dictionary[(n, k)] = mk_blocks
     end
 
@@ -135,7 +135,7 @@ function nt_regular_permutations(n)
 end
 
 """
-    compose(n, k, combin_nk)
+    build_mk_blocks(n, k, combin_nk)
 
     for n the cardinality of the set of integers in the range 1:n;
     for k a divisor of n;
@@ -143,7 +143,7 @@ end
     m = n/k the number of disjoint combinations whose union equals the 1:n set
     Produce all distinct m⋅k blocks of combin_nk elements whose union is {1,...,n}
 """
-function compose(n, k, combin_nk::Vector{Vector{UInt8}})::Vector{Vector{Vector{UInt8}}}
+function build_mk_blocks(n, k, combin_nk::Vector{Vector{UInt8}})::Vector{Vector{Vector{UInt8}}}
     # nof k-element combinations to be joined in each m⋅k block
     m = div(n,k)
 
@@ -151,7 +151,7 @@ function compose(n, k, combin_nk::Vector{Vector{UInt8}})::Vector{Vector{Vector{U
     lk_dict =  Dict{Int, Vector{Vector{Vector{UInt8}}}}()
     
     # Represent the input combin_nk as a vector of 1⋅k-blocks
-    # thus converting [--][--]⋯[--]  into [[--]][[--]]⋯[[--]]
+    # thus converting [--][--]⋯[--]  into  [[--]][[--]]⋯[[--]]
     lk_dict[1] = [[combin_nk[j]] for j in 1:lastindex(combin_nk)] 
 
     for l in 2:m
@@ -173,11 +173,16 @@ function compose(n, k, combin_nk::Vector{Vector{UInt8}})::Vector{Vector{Vector{U
             for k_block in combin_nk
                 #  iv) test whether integers at ii) overlap with those in the k-block at iii)
                 if !overlap(ik_block_integers, k_block)
-                    #  v) iff there is no overlap, create an l⋅k block by adding 
-                    #     the k-block at iii) to the i⋅k block at i)   
-                    lk_block = vcat(ik_block, [k_block])
-                    push!(lk_blocks,lk_block)
-                end
+                    #  v) iff there is no overlap, test that i⋅k block[end] < k_block, in order to avoid
+                    #     generating m! equivalent representations of each permutation, which would only 
+                    #     differ by a different ordering of the m k-cycles entering into its definition.     
+                    if isless(ik_block[end], k_block)
+                        #  vi) with no overlap and ordering guaranteeing uniqueness, create an l⋅k block 
+                        #      by adding the k-block at iii) to the i⋅k block at i)   
+                        lk_block = vcat(ik_block, [k_block])
+                        push!(lk_blocks,lk_block)
+                    end # if isless
+                end # if !overlap()
             end
         end
 

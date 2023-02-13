@@ -94,7 +94,7 @@ end # isvalid_cycle_representation()
 
     Convert from the plain representation of a permutation p to its cycle representation 
 """
-function plain_to_cycle(plain_p::Vector{<:Integer})
+function plain_to_cycle(plain_p::Vector{T})::Vector{Vector{T}} where{T <: Integer}
     if !isvalid_plain_representation(plain_p)
         error("The input vector 'p' is not a valid plain representation of a permutation.")
     end
@@ -160,7 +160,7 @@ end # plain_to_cycle()
 
     Convert from the cycle representation of a permutation p to its plain representation 
 """
-function cycle_to_plain(cycle_p::Vector{Vector{T}}) where{T <: Integer}
+function cycle_to_plain(cycle_p::Vector{Vector{T}})::Vector{T} where{T <: Integer}
     if !isvalid_cycle_representation(cycle_p)
         error("The input vector of vectors 'cycle_p' is not a valid cycle representation of a permutation.")
     end
